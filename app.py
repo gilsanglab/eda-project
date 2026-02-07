@@ -508,8 +508,13 @@ with tab7:
             st.pyplot(fig)
             
         with col2:
-            st.subheader("❤️ 충성도 Top 10 셀러")
-            top_retention = filtered_metrics.sort_values(by='RepurchaseRate', ascending=False).head(10)
+            st.subheader("❤️ 충성도 Top 10 셀러 (주문 10건 이상)")
+            # Filter for significant sellers to avoid 100% repurchase from 1-2 orders
+            significant_retention = filtered_metrics[filtered_metrics['OrderCount'] >= 10]
+            if len(significant_retention) < 5: # Fallback if too few
+                 significant_retention = filtered_metrics
+            
+            top_retention = significant_retention.sort_values(by='RepurchaseRate', ascending=False).head(10)
             fig, ax = plt.subplots(figsize=(8, 6))
             sns.barplot(x='RepurchaseRate', y='셀러명', data=top_retention, palette='Purples_r', ax=ax)
             ax.set_xlabel("재구매율 (%)")
