@@ -119,14 +119,16 @@ def calculate_seller_metrics(df):
     seller_stats['AOV'] = seller_stats['TotalRevenue'] / seller_stats['OrderCount']
     
     # Repurchase Rate (Complex calculation)
-    # For each seller, find % of customers who ordered > 1 time
-    if '주문자연락처' in df.columns:
+    # For each seller, find % of customers who ordered > 1 time (on different dates)
+    if '주문자연락처' in df.columns and 'Date' in df.columns:
         repurchase_data = []
         for seller in seller_stats['셀러명']:
             seller_df = df[df['셀러명'] == seller]
-            user_counts = seller_df['주문자연락처'].value_counts()
-            total_users = len(user_counts)
-            re_users = len(user_counts[user_counts > 1])
+            # Group by Customer, count unique Date
+            user_date_counts = seller_df.groupby('주문자연락처')['Date'].nunique()
+            total_users = len(user_date_counts)
+            # Repurchasing customers are those with Date count > 1
+            re_users = len(user_date_counts[user_date_counts > 1])
             rate = (re_users / total_users * 100) if total_users > 0 else 0
             repurchase_data.append(rate)
         seller_stats['RepurchaseRate'] = repurchase_data
