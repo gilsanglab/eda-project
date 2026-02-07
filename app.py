@@ -8,8 +8,21 @@ import matplotlib.font_manager as fm
 # --- Configuration ---
 st.set_page_config(page_title="프로젝트 1 판매 대시보드", layout="wide")
 
-# Set font for Korean support in plots (even if UI is English, data might be Korean)
-plt.rc('font', family='AppleGothic') 
+# Set font for Korean support based on OS
+import platform
+
+system_name = platform.system()
+
+if system_name == 'Darwin': # Mac
+    plt.rc('font', family='AppleGothic')
+elif system_name == 'Windows': # Windows
+    plt.rc('font', family='Malgun Gothic')
+else: # Linux (Streamlit Cloud)
+    # Try to find Nanum font
+    # Usually installed at /usr/share/fonts/truetype/nanum/NanumGothic.ttf
+    # But matplotlib needs the font family name
+    plt.rc('font', family='NanumGothic')
+
 plt.rcParams['axes.unicode_minus'] = False
 
 # --- Data Loading & Preprocessing ---
